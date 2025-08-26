@@ -1,1244 +1,999 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   DollarSign, 
   TrendingUp, 
   TrendingDown, 
-  PieChart, 
-  Calendar, 
   Plus, 
-  Eye, 
-  EyeOff, 
-  Settings, 
-  LogOut, 
-  User, 
-  CreditCard, 
-  Target,
-  AlertCircle,
+  Target, 
+  Calendar, 
+  PieChart, 
+  BarChart3,
+  Wallet,
+  CreditCard,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  AlertTriangle,
   CheckCircle,
   Trash2,
-  Edit,
-  Home,
-  Receipt,
-  BarChart3,
-  Menu,
-  X
+  Edit
 } from 'lucide-react';
 
-// API Configuration - Replace with your Railway URL
-const API_BASE = 'https://finance-app-production-2458.up.railway.app/api';
+const API_BASE = 'http://192.168.0.215:3000/api';
 
-// API Helper Functions
-const api = {
-  post: async (endpoint, data, token = null) => {
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  },
-  
-  get: async (endpoint, token = null) => {
-    const headers = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    
-    const response = await fetch(`${API_BASE}${endpoint}`, { headers });
-    return response.json();
-  },
-  
-  delete: async (endpoint, token = null) => {
-    const headers = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    
-    const response = await fetch(`${API_BASE}${endpoint}`, { 
-      method: 'DELETE', 
-      headers 
-    });
-    return response.json();
-  }
-};
-
-// Login Component
-function LoginPage({ onLogin }) {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-
-    try {
-      const endpoint = isLogin ? '/login' : '/register';
-      const data = isLogin 
-        ? { email: formData.email, password: formData.password }
-        : { username: formData.username, email: formData.email, password: formData.password };
-
-      const response = await api.post(endpoint, data);
-
-      if (response.success) {
-        if (isLogin) {
-          onLogin(response.token, response.user);
-        } else {
-          setMessage('Account created! Please log in.');
-          setIsLogin(true);
-        }
-      } else {
-        setMessage(response.message);
-      }
-    } catch (error) {
-      setMessage('Connection error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-sm mx-4">
-        <div className="text-center mb-8">
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl">
-            <DollarSign className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">FinanceFlow</h1>
-          <p className="text-gray-600">Your personal finance companion</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Username</label>
-              <input
-                type="text"
-                value={formData.username}
-                onChange={(e) => setFormData({...formData, username: e.target.value})}
-                className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900 placeholder-gray-500"
-                placeholder="Enter your username"
-                required={!isLogin}
-              />
-            </div>
-          )}
-          
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900 placeholder-gray-500"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900 placeholder-gray-500"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
-          {message && (
-            <div className={`p-4 rounded-2xl text-sm font-medium ${
-              message.includes('success') || message.includes('created') 
-                ? 'bg-green-100 text-green-800 border border-green-200' 
-                : 'bg-red-100 text-red-800 border border-red-200'
-            }`}>
-              {message}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-6 rounded-2xl font-semibold hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 shadow-lg"
-          >
-            {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setMessage('');
-            }}
-            className="text-purple-600 hover:text-purple-700 text-sm font-semibold transition-colors"
-          >
-            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Overview Tab Component
-function OverviewTab({ totalIncome, totalExpenses, netIncome, transactions, budgetOverview, onAddTransaction }) {
-  const recentTransactions = transactions.slice(0, 3);
-
-  return (
-    <div className="space-y-6">
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-3xl shadow-lg">
-          <div className="flex items-center justify-between text-white">
-            <div>
-              <p className="text-sm opacity-90 font-medium">Income</p>
-              <p className="text-2xl font-bold">${totalIncome.toFixed(2)}</p>
-            </div>
-            <div className="bg-white/20 p-3 rounded-2xl">
-              <TrendingUp className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-3xl shadow-lg">
-          <div className="flex items-center justify-between text-white">
-            <div>
-              <p className="text-sm opacity-90 font-medium">Expenses</p>
-              <p className="text-2xl font-bold">${totalExpenses.toFixed(2)}</p>
-            </div>
-            <div className="bg-white/20 p-3 rounded-2xl">
-              <TrendingDown className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-
-        <div className={`p-6 rounded-3xl shadow-lg ${netIncome >= 0 ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-orange-500 to-red-600'}`}>
-          <div className="flex items-center justify-between text-white">
-            <div>
-              <p className="text-sm opacity-90 font-medium">Net Income</p>
-              <p className="text-2xl font-bold">${netIncome.toFixed(2)}</p>
-            </div>
-            <div className="bg-white/20 p-3 rounded-2xl">
-              <DollarSign className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-500 to-violet-600 p-6 rounded-3xl shadow-lg">
-          <div className="flex items-center justify-between text-white">
-            <div>
-              <p className="text-sm opacity-90 font-medium">Budget Used</p>
-              <p className="text-2xl font-bold">{budgetOverview?.budgetUsedPercentage || 0}%</p>
-            </div>
-            <div className="bg-white/20 p-3 rounded-2xl">
-              <Target className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Add Button */}
-      <button
-        onClick={onAddTransaction}
-        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-6 rounded-3xl font-semibold flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-      >
-        <Plus className="w-5 h-5" />
-        <span>Add Transaction</span>
-      </button>
-
-      {/* Recent Transactions */}
-      <div className="bg-white rounded-3xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-900">Recent Activity</h3>
-          <Receipt className="w-6 h-6 text-gray-400" />
-        </div>
-
-        <div className="space-y-4">
-          {recentTransactions.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Receipt className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="font-medium">No transactions yet</p>
-              <p className="text-sm">Add your first transaction to get started</p>
-            </div>
-          ) : (
-            recentTransactions.map(transaction => (
-              <div key={transaction.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-2xl ${
-                    transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
-                  }`}>
-                    {transaction.type === 'income' ? 
-                      <TrendingUp className="w-5 h-5 text-green-600" /> :
-                      <TrendingDown className="w-5 h-5 text-red-600" />
-                    }
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{transaction.description}</p>
-                    <p className="text-sm text-gray-500">
-                      {transaction.Category?.name || 'No category'} • {new Date(transaction.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <p className={`font-bold text-lg ${
-                  transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
-                </p>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Budget Alerts */}
-      <div className="bg-white rounded-3xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Budget Status</h3>
-        
-        {budgetOverview?.overBudgetCount > 0 && (
-          <div className="mb-3 p-4 bg-red-100 rounded-2xl border border-red-200">
-            <div className="flex items-center space-x-3">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <span className="text-sm font-semibold text-red-800">
-                {budgetOverview.overBudgetCount} budget(s) exceeded
-              </span>
-            </div>
-          </div>
-        )}
-
-        {budgetOverview?.closeToLimitCount > 0 && (
-          <div className="mb-3 p-4 bg-yellow-100 rounded-2xl border border-yellow-200">
-            <div className="flex items-center space-x-3">
-              <AlertCircle className="w-5 h-5 text-yellow-600" />
-              <span className="text-sm font-semibold text-yellow-800">
-                {budgetOverview.closeToLimitCount} budget(s) near limit
-              </span>
-            </div>
-          </div>
-        )}
-
-        {(!budgetOverview?.overBudgetCount && !budgetOverview?.closeToLimitCount) && (
-          <div className="p-4 bg-green-100 rounded-2xl border border-green-200">
-            <div className="flex items-center space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <span className="text-sm font-semibold text-green-800">
-                All budgets on track
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Transactions Tab Component
-function TransactionsTab({ transactions, categories, onAddTransaction, onDeleteTransaction, token }) {
-  const [filter, setFilter] = useState('all');
-
-  const filteredTransactions = transactions.filter(t => {
-    if (filter === 'all') return true;
-    return t.type === filter;
-  });
-
-  const handleDelete = async (transactionId) => {
-    if (window.confirm('Are you sure you want to delete this transaction?')) {
-      try {
-        await api.delete(`/transactions/${transactionId}`, token);
-        onDeleteTransaction();
-      } catch (error) {
-        console.error('Error deleting transaction:', error);
-      }
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Transactions</h2>
-        <button
-          onClick={onAddTransaction}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex space-x-2">
-        {[
-          { id: 'all', label: 'All' },
-          { id: 'income', label: 'Income' },
-          { id: 'expense', label: 'Expenses' }
-        ].map(f => (
-          <button
-            key={f.id}
-            onClick={() => setFilter(f.id)}
-            className={`px-6 py-3 rounded-2xl text-sm font-semibold transition-all ${
-              filter === f.id
-                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Transactions List */}
-      <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
-        {filteredTransactions.length === 0 ? (
-          <div className="text-center py-12 px-6">
-            <Receipt className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No transactions found</h3>
-            <p className="text-gray-500 mb-6">Start by adding your first transaction</p>
-            <button
-              onClick={onAddTransaction}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-            >
-              Add Your First Transaction
-            </button>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {filteredTransactions.map(transaction => (
-              <div key={transaction.id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-3 rounded-2xl ${
-                      transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
-                    }`}>
-                      {transaction.type === 'income' ? 
-                        <TrendingUp className="w-5 h-5 text-green-600" /> :
-                        <TrendingDown className="w-5 h-5 text-red-600" />
-                      }
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900">{transaction.description}</h4>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <span className="bg-gray-100 px-3 py-1 rounded-full font-medium">
-                          {transaction.Category?.name || 'No category'}
-                        </span>
-                        <span>{new Date(transaction.date).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <p className={`text-xl font-bold ${
-                      transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
-                    </p>
-                    <button
-                      onClick={() => handleDelete(transaction.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-xl hover:bg-red-50"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Budgets Tab Component
-function BudgetsTab({ budgets, categories, budgetOverview, onAddBudget, onDeleteBudget, token }) {
-  const handleDelete = async (budgetId) => {
-    if (window.confirm('Are you sure you want to delete this budget?')) {
-      try {
-        const response = await api.delete(`/budgets/${budgetId}`, token);
-        if (response.success || response.message === 'Budget deleted successfully') {
-          onDeleteBudget();
-        } else {
-          console.error('Delete failed:', response.message);
-        }
-      } catch (error) {
-        console.error('Error deleting budget:', error);
-      }
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Budgets</h2>
-        <button
-          onClick={onAddBudget}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-      </div>
-      
-      {/* Budget Overview */}
-      {budgetOverview && (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-3xl shadow-lg text-white">
-            <p className="text-sm opacity-90 font-medium">Total Budget</p>
-            <p className="text-2xl font-bold">${budgetOverview.totalBudget?.toFixed(2) || '0.00'}</p>
-          </div>
-          <div className="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-3xl shadow-lg text-white">
-            <p className="text-sm opacity-90 font-medium">Total Spent</p>
-            <p className="text-2xl font-bold">${budgetOverview.totalSpent?.toFixed(2) || '0.00'}</p>
-          </div>
-          <div className={`p-6 rounded-3xl shadow-lg text-white ${(budgetOverview.remainingBudget || 0) >= 0 ? 'bg-gradient-to-br from-green-500 to-emerald-600' : 'bg-gradient-to-br from-orange-500 to-red-600'}`}>
-            <p className="text-sm opacity-90 font-medium">Remaining</p>
-            <p className="text-2xl font-bold">${budgetOverview.remainingBudget?.toFixed(2) || '0.00'}</p>
-          </div>
-          <div className="bg-gradient-to-br from-purple-500 to-violet-600 p-6 rounded-3xl shadow-lg text-white">
-            <p className="text-sm opacity-90 font-medium">Usage</p>
-            <p className="text-2xl font-bold">{budgetOverview.budgetUsedPercentage || 0}%</p>
-          </div>
-        </div>
-      )}
-
-      {/* Budget Categories */}
-      <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
-        {budgets.length === 0 ? (
-          <div className="text-center py-12 px-6">
-            <Target className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No budgets set</h3>
-            <p className="text-gray-500 mb-6">Create budgets to track your spending</p>
-            <button
-              onClick={onAddBudget}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-            >
-              Create Your First Budget
-            </button>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {budgets.map(budget => {
-              const percentageUsed = Math.round((budget.spentAmount / budget.budgetAmount) * 100);
-              const remaining = budget.budgetAmount - budget.spentAmount;
-              const status = budget.spentAmount > budget.budgetAmount ? 'over' : 
-                           budget.spentAmount >= (budget.budgetAmount * 0.8) ? 'warning' : 'good';
-              
-              return (
-                <div key={budget.id} className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="text-3xl bg-gray-100 p-3 rounded-2xl">
-                        {budget.Category?.icon || '💰'}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 text-lg">{budget.Category?.name}</h4>
-                        <p className="text-sm text-gray-500">
-                          ${budget.spentAmount?.toFixed(2) || '0.00'} of ${budget.budgetAmount?.toFixed(2) || '0.00'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <p className={`font-bold text-lg ${status === 'over' ? 'text-red-600' : status === 'warning' ? 'text-yellow-600' : 'text-green-600'}`}>
-                          ${remaining?.toFixed(2) || '0.00'}
-                        </p>
-                        <p className="text-sm text-gray-500">{percentageUsed}% used</p>
-                      </div>
-                      <button
-                        onClick={() => handleDelete(budget.id)}
-                        className="p-3 text-gray-400 hover:text-red-600 transition-colors rounded-xl hover:bg-red-50"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className={`h-3 rounded-full transition-all ${
-                        status === 'over' ? 'bg-gradient-to-r from-red-500 to-red-600' : 
-                        status === 'warning' ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gradient-to-r from-green-500 to-emerald-600'
-                      }`}
-                      style={{ width: `${Math.min(percentageUsed, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Analytics Tab Component
-function AnalyticsTab({ transactions, categories, budgets }) {
-  // Calculate expense breakdown by category
-  const expensesByCategory = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((acc, t) => {
-      const categoryName = t.Category?.name || 'Uncategorized';
-      acc[categoryName] = (acc[categoryName] || 0) + t.amount;
-      return acc;
-    }, {});
-
-  const categoryData = Object.entries(expensesByCategory).map(([name, amount]) => ({
-    name,
-    amount: amount.toFixed(2)
-  }));
-
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Analytics</h2>
-        <BarChart3 className="w-6 h-6 text-gray-400" />
-      </div>
-
-      <div className="space-y-6">
-        {/* Activity Summary */}
-        <div className="bg-white rounded-3xl shadow-lg p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">Activity Summary</h3>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100">
-              <div className="flex items-center space-x-4">
-                <div className="bg-green-100 p-3 rounded-2xl">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
-                </div>
-                <span className="font-semibold text-gray-900">Total Income</span>
-              </div>
-              <span className="font-bold text-xl text-green-600">
-                ${totalIncome.toFixed(2)}
-              </span>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl border border-red-100">
-              <div className="flex items-center space-x-4">
-                <div className="bg-red-100 p-3 rounded-2xl">
-                  <TrendingDown className="w-6 h-6 text-red-600" />
-                </div>
-                <span className="font-semibold text-gray-900">Total Expenses</span>
-              </div>
-              <span className="font-bold text-xl text-red-600">
-                ${totalExpenses.toFixed(2)}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
-              <div className="flex items-center space-x-4">
-                <div className="bg-blue-100 p-3 rounded-2xl">
-                  <Target className="w-6 h-6 text-blue-600" />
-                </div>
-                <span className="font-semibold text-gray-900">Active Budgets</span>
-              </div>
-              <span className="font-bold text-xl text-blue-600">{budgets.length}</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl border border-purple-100">
-              <div className="flex items-center space-x-4">
-                <div className="bg-purple-100 p-3 rounded-2xl">
-                  <Receipt className="w-6 h-6 text-purple-600" />
-                </div>
-                <span className="font-semibold text-gray-900">Total Transactions</span>
-              </div>
-              <span className="font-bold text-xl text-purple-600">{transactions.length}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Spending by Category */}
-        <div className="bg-white rounded-3xl shadow-lg p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">Spending by Category</h3>
-          
-          {categoryData.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <PieChart className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="font-medium">No expense data available</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {categoryData.map((category, index) => {
-                const percentage = totalExpenses > 0 ? ((category.amount / totalExpenses) * 100).toFixed(1) : 0;
-                return (
-                  <div key={category.name} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                    <div className="flex items-center space-x-4">
-                      <div 
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: `hsl(${index * 137.508}deg, 70%, 60%)` }}
-                      />
-                      <div>
-                        <span className="font-semibold text-gray-900">{category.name}</span>
-                        <p className="text-sm text-gray-500">{percentage}% of total</p>
-                      </div>
-                    </div>
-                    <span className="font-bold text-gray-900">${category.amount}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Add Transaction Modal
-function AddTransactionModal({ categories, token, onClose, onSuccess }) {
-  const [formData, setFormData] = useState({
-    description: '',
-    amount: '',
-    type: 'expense',
-    categoryId: '',
-    date: new Date().toISOString().split('T')[0]
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await api.post('/transactions', {
-        ...formData,
-        amount: parseFloat(formData.amount),
-        categoryId: formData.categoryId || null
-      }, token);
-
-      if (response.success) {
-        onSuccess();
-      } else {
-        setError(response.message || 'Failed to add transaction');
-      }
-    } catch (error) {
-      console.error('Error adding transaction:', error);
-      setError('Connection error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl font-bold text-gray-900">Add Transaction</h3>
-          <button 
-            onClick={onClose} 
-            className="text-gray-400 hover:text-gray-600 p-2 rounded-2xl hover:bg-gray-100 transition-all"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Description</label>
-            <input
-              type="text"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
-              placeholder="Enter description"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Amount</label>
-            <input
-              type="number"
-              step="0.01"
-              value={formData.amount}
-              onChange={(e) => setFormData({...formData, amount: e.target.value})}
-              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
-              placeholder="0.00"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-            <div className="flex space-x-3">
-              <button
-                type="button"
-                onClick={() => setFormData({...formData, type: 'expense', categoryId: ''})}
-                className={`flex-1 py-4 px-6 rounded-2xl font-semibold transition-all ${
-                  formData.type === 'expense'
-                    ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                Expense
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({...formData, type: 'income', categoryId: ''})}
-                className={`flex-1 py-4 px-6 rounded-2xl font-semibold transition-all ${
-                  formData.type === 'income'
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                Income
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Category</label>
-            <select
-              value={formData.categoryId}
-              onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
-              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
-            >
-              <option value="">Select category (optional)</option>
-              {categories
-                .filter(c => c.type === formData.type)
-                .map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Date</label>
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({...formData, date: e.target.value})}
-              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="p-4 rounded-2xl bg-red-100 text-red-800 border border-red-200 text-sm font-medium">
-              {error}
-            </div>
-          )}
-
-          <div className="flex space-x-4 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-4 text-gray-700 bg-gray-100 rounded-2xl font-semibold hover:bg-gray-200 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-semibold hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
-            >
-              {loading ? 'Adding...' : 'Add Transaction'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-// Add Budget Modal - Fixed version
-function AddBudgetModal({ categories, token, onClose, onSuccess }) {
-  const [formData, setFormData] = useState({
-    categoryId: '',
-    budgetAmount: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  // Filter categories to only show expense categories for budgets
-  const expenseCategories = categories.filter(c => c.type === 'expense');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    if (!formData.categoryId) {
-      setError('Please select a category');
-      setLoading(false);
-      return;
-    }
-
-    if (!formData.budgetAmount || parseFloat(formData.budgetAmount) <= 0) {
-      setError('Please enter a valid budget amount');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await api.post('/budgets', {
-        categoryId: parseInt(formData.categoryId),
-        budgetAmount: parseFloat(formData.budgetAmount)
-      }, token);
-
-      console.log('Budget creation response:', response);
-
-      if (response.success || response.budget) {
-        onSuccess();
-      } else {
-        setError(response.message || 'Failed to create budget');
-      }
-    } catch (error) {
-      console.error('Error adding budget:', error);
-      setError('Connection error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl font-bold text-gray-900">Add Budget</h3>
-          <button 
-            onClick={onClose} 
-            className="text-gray-400 hover:text-gray-600 p-2 rounded-2xl hover:bg-gray-100 transition-all"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Category</label>
-            <select
-              value={formData.categoryId}
-              onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
-              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
-              required
-            >
-              <option value="">Select a category</option>
-              {expenseCategories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            {expenseCategories.length === 0 && (
-              <p className="text-sm text-gray-500 mt-2">No expense categories available. Categories may need to be created first.</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Budget Amount</label>
-            <input
-              type="number"
-              step="0.01"
-              min="0.01"
-              value={formData.budgetAmount}
-              onChange={(e) => setFormData({...formData, budgetAmount: e.target.value})}
-              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
-              placeholder="0.00"
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="p-4 rounded-2xl bg-red-100 text-red-800 border border-red-200 text-sm font-medium">
-              {error}
-            </div>
-          )}
-
-          <div className="flex space-x-4 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-4 text-gray-700 bg-gray-100 rounded-2xl font-semibold hover:bg-gray-200 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading || expenseCategories.length === 0}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-semibold hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
-            >
-              {loading ? 'Creating...' : 'Create Budget'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-// Mobile Navigation Component
-function MobileNav({ activeTab, setActiveTab, onLogout, user }) {
-  const [showMenu, setShowMenu] = useState(false);
-
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: Home },
-    { id: 'transactions', label: 'Transactions', icon: Receipt },
-    { id: 'budgets', label: 'Budgets', icon: Target },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 }
-  ];
-
-  return (
-    <>
-      {/* Top Header */}
-      <div className="bg-white shadow-lg border-b sticky top-0 z-40">
-        <div className="px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg">
-                <DollarSign className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">FinanceFlow</h1>
-                <p className="text-sm text-gray-500">Welcome, {user?.username}</p>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-2xl hover:bg-gray-100 transition-colors"
-            >
-              {showMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-
-          {/* Dropdown Menu */}
-          {showMenu && (
-            <div className="absolute top-full left-0 right-0 bg-white shadow-xl border-t z-50">
-              <div className="py-4">
-                {tabs.map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      setShowMenu(false);
-                    }}
-                    className={`w-full flex items-center space-x-3 px-6 py-4 text-left transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-gradient-to-r from-purple-50 to-blue-50 text-purple-700 border-r-4 border-purple-600'
-                        : 'text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    <tab.icon className="w-5 h-5" />
-                    <span className="font-medium">{tab.label}</span>
-                  </button>
-                ))}
-                <hr className="my-2" />
-                <button
-                  onClick={() => {
-                    onLogout();
-                    setShowMenu(false);
-                  }}
-                  className="w-full flex items-center space-x-3 px-6 py-4 text-left text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span className="font-medium">Logout</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40">
-        <div className="grid grid-cols-4 py-2">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center py-3 transition-all ${
-                activeTab === tab.id
-                  ? 'text-purple-600'
-                  : 'text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              <tab.icon className={`w-6 h-6 mb-1 ${
-                activeTab === tab.id ? 'scale-110' : ''
-              } transition-transform`} />
-              <span className={`text-xs font-medium ${
-                activeTab === tab.id ? 'text-purple-600' : 'text-gray-400'
-              }`}>
-                {tab.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
-
-// Dashboard Component
-function Dashboard({ user, token, onLogout }) {
+const FinanceApp = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem('token');
+    }
+    return null;
+  });
+  const [showAuth, setShowAuth] = useState(!token);
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [budgets, setBudgets] = useState([]);
   const [budgetOverview, setBudgetOverview] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showAddTransaction, setShowAddTransaction] = useState(false);
-  const [showAddBudget, setShowAddBudget] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Load initial data
+  // Auth form state
+  const [isLogin, setIsLogin] = useState(true);
+  const [authForm, setAuthForm] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
+
+  // Transaction form state
+  const [showTransactionForm, setShowTransactionForm] = useState(false);
+  const [transactionForm, setTransactionForm] = useState({
+    amount: '',
+    description: '',
+    type: 'expense',
+    CategoryId: ''
+  });
+
+  // Budget form state
+  const [showBudgetForm, setShowBudgetForm] = useState(false);
+  const [budgetForm, setBudgetForm] = useState({
+    CategoryId: '',
+    budgetAmount: '',
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear()
+  });
+
   useEffect(() => {
-    loadData();
+    if (token) {
+      fetchData();
+    }
   }, [token]);
 
-  const loadData = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const [transRes, catRes, budgetRes, overviewRes] = await Promise.all([
-        api.get('/transactions', token),
-        api.get('/categories', token),
-        api.get('/budgets', token),
-        api.get('/budgets/overview', token)
-      ]);
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      // Fetch categories
+      const categoriesRes = await fetch(`${API_BASE}/categories`, { headers });
+      const categoriesData = await categoriesRes.json();
+      if (categoriesData.success) {
+        setCategories(categoriesData.categories);
+      }
 
-      console.log('API Responses:', { transRes, catRes, budgetRes, overviewRes });
+      // Fetch transactions
+      const transactionsRes = await fetch(`${API_BASE}/transactions`, { headers });
+      const transactionsData = await transactionsRes.json();
+      if (transactionsData.success) {
+        setTransactions(transactionsData.transactions);
+      }
 
-      if (transRes.success) setTransactions(transRes.transactions || []);
-      if (catRes.success) setCategories(catRes.categories || []);
-      if (budgetRes.success) setBudgets(budgetRes.budgets || []);
-      if (overviewRes.success) setBudgetOverview(overviewRes.overview);
+      // Fetch budget overview
+      const budgetOverviewRes = await fetch(`${API_BASE}/budgets/overview`, { headers });
+      const budgetOverviewData = await budgetOverviewRes.json();
+      if (budgetOverviewData.success) {
+        setBudgetOverview(budgetOverviewData.overview);
+        setBudgets(budgetOverviewData.budgets || []);
+      }
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Calculate summary stats
-  const totalIncome = transactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const endpoint = isLogin ? '/login' : '/register';
+      const body = isLogin 
+        ? { email: authForm.email, password: authForm.password }
+        : authForm;
 
-  const totalExpenses = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
 
-  const netIncome = totalIncome - totalExpenses;
+      const data = await response.json();
+      
+      if (data.success) {
+        if (isLogin) {
+          setToken(data.token);
+          setUser(data.user);
+          setShowAuth(false);
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('token', data.token);
+          }
+        } else {
+          setIsLogin(true);
+          setAuthForm({ username: '', email: '', password: '' });
+        }
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+      alert('Authentication failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (loading) {
+  const handleAddTransaction = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE}/transactions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...transactionForm,
+          amount: parseFloat(transactionForm.amount),
+          CategoryId: transactionForm.CategoryId || null
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setShowTransactionForm(false);
+        setTransactionForm({
+          amount: '',
+          description: '',
+          type: 'expense',
+          CategoryId: ''
+        });
+        fetchData();
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Transaction error:', error);
+      alert('Failed to add transaction');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetBudget = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE}/budgets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...budgetForm,
+          budgetAmount: parseFloat(budgetForm.budgetAmount)
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setShowBudgetForm(false);
+        setBudgetForm({
+          CategoryId: '',
+          budgetAmount: '',
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear()
+        });
+        fetchData();
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Budget error:', error);
+      alert('Failed to set budget');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteTransaction = async (id) => {
+    if (!confirm('Delete this transaction?')) return;
+    
+    try {
+      const response = await fetch(`${API_BASE}/transactions/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        fetchData();
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const getRecentTransactions = () => {
+    return transactions.slice(0, 5);
+  };
+
+  const getMonthlyStats = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    const thisMonth = transactions.filter(t => {
+      const tDate = new Date(t.date);
+      return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
+    });
+
+    const income = thisMonth.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    const expenses = thisMonth.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    
+    return { income, expenses, net: income - expenses };
+  };
+
+  if (showAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading your financial data...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Wallet className="text-white w-8 h-8" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800">Finance Tracker</h1>
+            <p className="text-gray-600">Manage your money with ease</p>
+          </div>
+
+          <form onSubmit={handleAuth} className="space-y-4">
+            {!isLogin && (
+              <div>
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={authForm.username}
+                  onChange={(e) => setAuthForm({...authForm, username: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+            )}
+            <div>
+              <input
+                type="email"
+                placeholder="Email"
+                value={authForm.email}
+                onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={authForm.password}
+                onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Sign Up')}
+            </button>
+          </form>
+
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-blue-600 hover:underline"
+            >
+              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 pb-20">
-      <MobileNav 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        onLogout={onLogout} 
-        user={user} 
-      />
+  const monthlyStats = getMonthlyStats();
 
-      <div className="px-4 py-6">
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center">
+                <Wallet className="text-white w-6 h-6" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Finance Tracker</h1>
+                <p className="text-sm text-gray-500">Welcome back!</p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setToken(null);
+                setShowAuth(true);
+                setUser(null);
+                if (typeof window !== 'undefined' && window.localStorage) {
+                  localStorage.removeItem('token');
+                }
+              }}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation Tabs */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-8 overflow-x-auto">
+            {[
+              { id: 'overview', label: 'Overview', icon: BarChart3 },
+              { id: 'transactions', label: 'Transactions', icon: CreditCard },
+              { id: 'budgets', label: 'Budgets', icon: Target },
+              { id: 'analytics', label: 'Analytics', icon: PieChart }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'overview' && (
-          <OverviewTab 
-            totalIncome={totalIncome}
-            totalExpenses={totalExpenses}
-            netIncome={netIncome}
-            transactions={transactions}
-            budgetOverview={budgetOverview}
-            onAddTransaction={() => setShowAddTransaction(true)}
-          />
+          <div className="space-y-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Monthly Income</p>
+                    <p className="text-2xl font-bold text-green-600">{formatCurrency(monthlyStats.income)}</p>
+                  </div>
+                  <div className="bg-green-100 p-3 rounded-full">
+                    <ArrowUpCircle className="w-6 h-6 text-green-600" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Monthly Expenses</p>
+                    <p className="text-2xl font-bold text-red-600">{formatCurrency(monthlyStats.expenses)}</p>
+                  </div>
+                  <div className="bg-red-100 p-3 rounded-full">
+                    <ArrowDownCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Net Income</p>
+                    <p className={`text-2xl font-bold ${monthlyStats.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(monthlyStats.net)}
+                    </p>
+                  </div>
+                  <div className={`p-3 rounded-full ${monthlyStats.net >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+                    <DollarSign className={`w-6 h-6 ${monthlyStats.net >= 0 ? 'text-green-600' : 'text-red-600'}`} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Budget Overview */}
+            {budgetOverview && (
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget Overview</h3>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Total Budget</p>
+                    <p className="text-xl font-bold text-blue-600">{formatCurrency(budgetOverview.totalBudget)}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Total Spent</p>
+                    <p className="text-xl font-bold text-red-600">{formatCurrency(budgetOverview.totalSpent)}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Remaining</p>
+                    <p className="text-xl font-bold text-green-600">{formatCurrency(budgetOverview.remainingBudget)}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Budget Used</p>
+                    <p className="text-xl font-bold text-gray-900">{budgetOverview.budgetUsedPercentage}%</p>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${budgetOverview.budgetUsedPercentage > 100 ? 'bg-red-500' : budgetOverview.budgetUsedPercentage > 80 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                      style={{ width: `${Math.min(budgetOverview.budgetUsedPercentage, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Recent Transactions */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
+                <button
+                  onClick={() => setShowTransactionForm(true)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Transaction</span>
+                </button>
+              </div>
+              <div className="space-y-3">
+                {getRecentTransactions().map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-full ${transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'}`}>
+                        {transaction.type === 'income' ? 
+                          <ArrowUpCircle className="w-4 h-4 text-green-600" /> : 
+                          <ArrowDownCircle className="w-4 h-4 text-red-600" />
+                        }
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{transaction.description}</p>
+                        <p className="text-sm text-gray-500">{transaction.Category?.name || 'No category'}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                        {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      </p>
+                      <p className="text-sm text-gray-500">{formatDate(transaction.date)}</p>
+                    </div>
+                  </div>
+                ))}
+                {transactions.length === 0 && (
+                  <p className="text-gray-500 text-center py-8">No transactions yet. Add your first transaction!</p>
+                )}
+              </div>
+            </div>
+          </div>
         )}
 
         {activeTab === 'transactions' && (
-          <TransactionsTab 
-            transactions={transactions}
-            categories={categories}
-            onAddTransaction={() => setShowAddTransaction(true)}
-            onDeleteTransaction={loadData}
-            token={token}
-          />
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Transactions</h2>
+              <button
+                onClick={() => setShowTransactionForm(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Transaction</span>
+              </button>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm">
+              <div className="p-6">
+                <div className="space-y-4">
+                  {transactions.map((transaction) => (
+                    <div key={transaction.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+                      <div className="flex items-center space-x-4">
+                        <div className={`p-3 rounded-full ${transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'}`}>
+                          {transaction.type === 'income' ? 
+                            <ArrowUpCircle className="w-5 h-5 text-green-600" /> : 
+                            <ArrowDownCircle className="w-5 h-5 text-red-600" />
+                          }
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{transaction.description}</p>
+                          <div className="flex items-center space-x-2 text-sm text-gray-500">
+                            <span>{transaction.Category?.name || 'No category'}</span>
+                            <span>•</span>
+                            <span>{formatDate(transaction.date)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-right">
+                          <p className={`font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                            {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteTransaction(transaction.id)}
+                          className="text-red-500 hover:text-red-700 p-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {transactions.length === 0 && (
+                    <div className="text-center py-12">
+                      <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">No transactions yet</p>
+                      <p className="text-sm text-gray-400">Add your first transaction to get started</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {activeTab === 'budgets' && (
-          <BudgetsTab 
-            budgets={budgets}
-            categories={categories}
-            budgetOverview={budgetOverview}
-            onAddBudget={() => setShowAddBudget(true)}
-            onDeleteBudget={loadData}
-            token={token}
-          />
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Budgets</h2>
+              <button
+                onClick={() => setShowBudgetForm(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Set Budget</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {budgets.map((budget) => {
+                const percentage = budget.budgetAmount > 0 ? (budget.spentAmount / budget.budgetAmount) * 100 : 0;
+                const status = budget.status;
+                
+                return (
+                  <div key={budget.id} className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl">{budget.Category?.icon || '💰'}</span>
+                        <h3 className="font-semibold text-gray-900">{budget.Category?.name}</h3>
+                      </div>
+                      <div className={`p-1 rounded-full ${
+                        status === 'over' ? 'bg-red-100' : 
+                        status === 'warning' ? 'bg-yellow-100' : 'bg-green-100'
+                      }`}>
+                        {status === 'over' ? 
+                          <AlertTriangle className="w-4 h-4 text-red-600" /> :
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        }
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 mb-4">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Spent</span>
+                        <span className="font-medium">{formatCurrency(budget.spentAmount)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Budget</span>
+                        <span className="font-medium">{formatCurrency(budget.budgetAmount)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Remaining</span>
+                        <span className={`font-medium ${budget.remainingAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatCurrency(budget.remainingAmount)}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Progress</span>
+                        <span className="font-medium">{Math.round(percentage)}%</span>
+                      </div>
+                      <div className="bg-gray-200 rounded-full h-3">
+                        <div 
+                          className={`h-3 rounded-full transition-all ${
+                            status === 'over' ? 'bg-red-500' : 
+                            status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'
+                          }`}
+                          style={{ width: `${Math.min(percentage, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {budgets.length === 0 && (
+                <div className="col-span-full text-center py-12">
+                  <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">No budgets set yet</p>
+                  <p className="text-sm text-gray-400">Create your first budget to track spending</p>
+                </div>
+              )}
+            </div>
+          </div>
         )}
 
         {activeTab === 'analytics' && (
-          <AnalyticsTab 
-            transactions={transactions}
-            categories={categories}
-            budgets={budgets}
-          />
-        )}
-      </div>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Analytics</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Category Breakdown */}
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Expenses by Category</h3>
+                <div className="space-y-3">
+                  {categories.filter(c => c.type === 'expense').map((category) => {
+                    const categoryTransactions = transactions.filter(t => 
+                      t.CategoryId === category.id && t.type === 'expense'
+                    );
+                    const total = categoryTransactions.reduce((sum, t) => sum + t.amount, 0);
+                    const percentage = transactions.length > 0 ? 
+                      (total / transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)) * 100 : 0;
+                    
+                    if (total === 0) return null;
+                    
+                    return (
+                      <div key={category.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-xl">{category.icon || '💰'}</span>
+                          <span className="text-gray-900">{category.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">{formatCurrency(total)}</p>
+                          <p className="text-sm text-gray-500">{Math.round(percentage)}%</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
-      {/* Modals */}
-      {showAddTransaction && (
-        <AddTransactionModal
-          categories={categories}
-          token={token}
-          onClose={() => setShowAddTransaction(false)}
-          onSuccess={() => {
-            setShowAddTransaction(false);
-            loadData();
-          }}
-        />
+              {/* Monthly Trends */}
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Summary</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <ArrowUpCircle className="w-5 h-5 text-green-600" />
+                      <span className="text-green-800">Total Income</span>
+                    </div>
+                    <span className="font-semibold text-green-600">{formatCurrency(monthlyStats.income)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <ArrowDownCircle className="w-5 h-5 text-red-600" />
+                      <span className="text-red-800">Total Expenses</span>
+                    </div>
+                    <span className="font-semibold text-red-600">{formatCurrency(monthlyStats.expenses)}</span>
+                  </div>
+
+                  <div className={`flex justify-between items-center p-3 rounded-lg ${monthlyStats.net >= 0 ? 'bg-blue-50' : 'bg-yellow-50'}`}>
+                    <div className="flex items-center space-x-3">
+                      <DollarSign className={`w-5 h-5 ${monthlyStats.net >= 0 ? 'text-blue-600' : 'text-yellow-600'}`} />
+                      <span className={`${monthlyStats.net >= 0 ? 'text-blue-800' : 'text-yellow-800'}`}>Net Income</span>
+                    </div>
+                    <span className={`font-semibold ${monthlyStats.net >= 0 ? 'text-blue-600' : 'text-yellow-600'}`}>
+                      {formatCurrency(monthlyStats.net)}
+                    </span>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <p className="text-sm text-gray-600 mb-2">Transaction Count</p>
+                    <div className="flex justify-between text-sm">
+                      <span>Income: {transactions.filter(t => t.type === 'income').length}</span>
+                      <span>Expenses: {transactions.filter(t => t.type === 'expense').length}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Budget vs Actual */}
+            {budgets.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Actual Spending</h3>
+                <div className="space-y-4">
+                  {budgets.map((budget) => (
+                    <div key={budget.id} className="p-4 border border-gray-200 rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-gray-900">{budget.Category?.name}</span>
+                        <span className="text-sm text-gray-500">{budget.percentageUsed}% used</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-600">Budgeted</p>
+                          <p className="font-medium">{formatCurrency(budget.budgetAmount)}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Actual</p>
+                          <p className={`font-medium ${budget.spentAmount > budget.budgetAmount ? 'text-red-600' : 'text-green-600'}`}>
+                            {formatCurrency(budget.spentAmount)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <div className="bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full ${budget.status === 'over' ? 'bg-red-500' : budget.status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'}`}
+                            style={{ width: `${Math.min(budget.percentageUsed, 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* Transaction Form Modal */}
+      {showTransactionForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Add Transaction</h3>
+              <button
+                onClick={() => setShowTransactionForm(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleAddTransaction} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={transactionForm.amount}
+                  onChange={(e) => setTransactionForm({...transactionForm, amount: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <input
+                  type="text"
+                  value={transactionForm.description}
+                  onChange={(e) => setTransactionForm({...transactionForm, description: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Transaction description"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <select
+                  value={transactionForm.type}
+                  onChange={(e) => setTransactionForm({...transactionForm, type: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="expense">Expense</option>
+                  <option value="income">Income</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select
+                  value={transactionForm.CategoryId}
+                  onChange={(e) => setTransactionForm({...transactionForm, CategoryId: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">No category</option>
+                  {categories
+                    .filter(cat => cat.type === transactionForm.type)
+                    .map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.icon} {category.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowTransactionForm(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Adding...' : 'Add Transaction'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
-      {showAddBudget && (
-        <AddBudgetModal
-          categories={categories}
-          token={token}
-          onClose={() => setShowAddBudget(false)}
-          onSuccess={() => {
-            setShowAddBudget(false);
-            loadData();
-          }}
-        />
+      {/* Budget Form Modal */}
+      {showBudgetForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Set Budget</h3>
+              <button
+                onClick={() => setShowBudgetForm(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleSetBudget} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select
+                  value={budgetForm.CategoryId}
+                  onChange={(e) => setBudgetForm({...budgetForm, CategoryId: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Select a category</option>
+                  {categories
+                    .filter(cat => cat.type === 'expense')
+                    .map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.icon} {category.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Budget Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={budgetForm.budgetAmount}
+                  onChange={(e) => setBudgetForm({...budgetForm, budgetAmount: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                  <select
+                    value={budgetForm.month}
+                    onChange={(e) => setBudgetForm({...budgetForm, month: parseInt(e.target.value)})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {Array.from({length: 12}, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {new Date(0, i).toLocaleString('default', { month: 'long' })}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                  <select
+                    value={budgetForm.year}
+                    onChange={(e) => setBudgetForm({...budgetForm, year: parseInt(e.target.value)})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {Array.from({length: 3}, (_, i) => {
+                      const year = new Date().getFullYear() + i;
+                      return (
+                        <option key={year} value={year}>{year}</option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowBudgetForm(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Setting...' : 'Set Budget'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
-}
+};
 
-// Main App Component
-export default function PersonalFinanceApp() {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+export default FinanceApp; 
+  return(
+    <div>
+        <h3> Summary </h3>
 
-  const handleLogin = (authToken, userData) => {
-    setToken(authToken);
-    setUser(userData);
-  };
-
-  const handleLogout = () => {
-    setToken(null);
-    setUser(null);
-  };
-
-  if (!user || !token) {
-    return <LoginPage onLogin={handleLogin} />;
-  }
-
-  return <Dashboard user={user} token={token} onLogout={handleLogout} />;
-}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                      <ArrowUpCircle className="w-5 h-5 text-green-600" />
+                      <span className="text-green-800">Total Income</span>
+                    </div>
+                    <span className="font-semibold text-green-600">{formatCurrency(monthlyStats.income)}</span>
+                  </div>
+                  </div>
+    </div>
+      
+    
+  )
+              
