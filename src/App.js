@@ -19,7 +19,7 @@ import {
   Edit
 } from 'lucide-react';
 
-const API_BASE = 'http://192.168.0.215:3000/api';
+const API_BASE = 'https://finance-app-production-2458.up.railway.app/api';
 
 const FinanceApp = () => {
   const [activeTab, setActiveTab] = useState('overview');
