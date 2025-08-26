@@ -19,7 +19,9 @@ import {
   Edit,
   Home,
   Receipt,
-  BarChart3
+  BarChart3,
+  Menu,
+  X
 } from 'lucide-react';
 
 // API Configuration - Replace with your Railway URL
@@ -101,57 +103,60 @@ function LoginPage({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-sm mx-4">
         <div className="text-center mb-8">
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <DollarSign className="w-8 h-8 text-white" />
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+            <DollarSign className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Personal Finance</h1>
-          <p className="text-gray-600">Manage your money with ease</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">FinanceFlow</h1>
+          <p className="text-gray-600">Your personal finance companion</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {!isLogin && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Username</label>
               <input
                 type="text"
                 value={formData.username}
                 onChange={(e) => setFormData({...formData, username: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900 placeholder-gray-500"
+                placeholder="Enter your username"
                 required={!isLogin}
               />
             </div>
           )}
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900 placeholder-gray-500"
+              placeholder="Enter your email"
               required
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
             <input
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900 placeholder-gray-500"
+              placeholder="Enter your password"
               required
             />
           </div>
 
           {message && (
-            <div className={`p-3 rounded-lg text-sm ${
+            <div className={`p-4 rounded-2xl text-sm font-medium ${
               message.includes('success') || message.includes('created') 
-                ? 'bg-green-100 text-green-700' 
-                : 'bg-red-100 text-red-700'
+                ? 'bg-green-100 text-green-800 border border-green-200' 
+                : 'bg-red-100 text-red-800 border border-red-200'
             }`}>
               {message}
             </div>
@@ -160,19 +165,19 @@ function LoginPage({ onLogin }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 transition-all"
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-6 rounded-2xl font-semibold hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 shadow-lg"
           >
             {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <button
             onClick={() => {
               setIsLogin(!isLogin);
               setMessage('');
             }}
-            className="text-blue-600 hover:text-blue-700 text-sm"
+            className="text-purple-600 hover:text-purple-700 text-sm font-semibold transition-colors"
           >
             {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
           </button>
@@ -184,152 +189,150 @@ function LoginPage({ onLogin }) {
 
 // Overview Tab Component
 function OverviewTab({ totalIncome, totalExpenses, netIncome, transactions, budgetOverview, onAddTransaction }) {
-  const recentTransactions = transactions.slice(0, 5);
+  const recentTransactions = transactions.slice(0, 3);
 
   return (
     <div className="space-y-6">
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-3xl shadow-lg">
+          <div className="flex items-center justify-between text-white">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Income</p>
-              <p className="text-2xl font-bold text-green-600">${totalIncome.toFixed(2)}</p>
+              <p className="text-sm opacity-90 font-medium">Income</p>
+              <p className="text-2xl font-bold">${totalIncome.toFixed(2)}</p>
             </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <TrendingUp className="w-6 h-6 text-green-600" />
+            <div className="bg-white/20 p-3 rounded-2xl">
+              <TrendingUp className="w-6 h-6" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-3xl shadow-lg">
+          <div className="flex items-center justify-between text-white">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Expenses</p>
-              <p className="text-2xl font-bold text-red-600">${totalExpenses.toFixed(2)}</p>
+              <p className="text-sm opacity-90 font-medium">Expenses</p>
+              <p className="text-2xl font-bold">${totalExpenses.toFixed(2)}</p>
             </div>
-            <div className="bg-red-100 p-3 rounded-full">
-              <TrendingDown className="w-6 h-6 text-red-600" />
+            <div className="bg-white/20 p-3 rounded-2xl">
+              <TrendingDown className="w-6 h-6" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between">
+        <div className={`p-6 rounded-3xl shadow-lg ${netIncome >= 0 ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-orange-500 to-red-600'}`}>
+          <div className="flex items-center justify-between text-white">
             <div>
-              <p className="text-sm font-medium text-gray-600">Net Income</p>
-              <p className={`text-2xl font-bold ${netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ${netIncome.toFixed(2)}
-              </p>
+              <p className="text-sm opacity-90 font-medium">Net Income</p>
+              <p className="text-2xl font-bold">${netIncome.toFixed(2)}</p>
             </div>
-            <div className={`p-3 rounded-full ${netIncome >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-              <DollarSign className={`w-6 h-6 ${netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`} />
+            <div className="bg-white/20 p-3 rounded-2xl">
+              <DollarSign className="w-6 h-6" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-br from-purple-500 to-violet-600 p-6 rounded-3xl shadow-lg">
+          <div className="flex items-center justify-between text-white">
             <div>
-              <p className="text-sm font-medium text-gray-600">Budget Used</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {budgetOverview?.budgetUsedPercentage || 0}%
-              </p>
+              <p className="text-sm opacity-90 font-medium">Budget Used</p>
+              <p className="text-2xl font-bold">{budgetOverview?.budgetUsedPercentage || 0}%</p>
             </div>
-            <div className="bg-blue-100 p-3 rounded-full">
-              <Target className="w-6 h-6 text-blue-600" />
+            <div className="bg-white/20 p-3 rounded-2xl">
+              <Target className="w-6 h-6" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Recent Activity & Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
-            <button
-              onClick={onAddTransaction}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Transaction</span>
-            </button>
-          </div>
+      {/* Quick Add Button */}
+      <button
+        onClick={onAddTransaction}
+        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-6 rounded-3xl font-semibold flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+      >
+        <Plus className="w-5 h-5" />
+        <span>Add Transaction</span>
+      </button>
 
-          <div className="space-y-3">
-            {recentTransactions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Receipt className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No transactions yet</p>
-                <p className="text-sm">Add your first transaction to get started</p>
-              </div>
-            ) : (
-              recentTransactions.map(transaction => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${
-                      transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
-                    }`}>
-                      {transaction.type === 'income' ? 
-                        <TrendingUp className="w-4 h-4 text-green-600" /> :
-                        <TrendingDown className="w-4 h-4 text-red-600" />
-                      }
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{transaction.description}</p>
-                      <p className="text-sm text-gray-500">
-                        {transaction.Category?.name || 'No category'} • {new Date(transaction.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <p className={`font-semibold ${
-                    transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+      {/* Recent Transactions */}
+      <div className="bg-white rounded-3xl shadow-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-gray-900">Recent Activity</h3>
+          <Receipt className="w-6 h-6 text-gray-400" />
+        </div>
+
+        <div className="space-y-4">
+          {recentTransactions.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <Receipt className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p className="font-medium">No transactions yet</p>
+              <p className="text-sm">Add your first transaction to get started</p>
+            </div>
+          ) : (
+            recentTransactions.map(transaction => (
+              <div key={transaction.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                <div className="flex items-center space-x-4">
+                  <div className={`p-3 rounded-2xl ${
+                    transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
                   }`}>
-                    {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
-                  </p>
+                    {transaction.type === 'income' ? 
+                      <TrendingUp className="w-5 h-5 text-green-600" /> :
+                      <TrendingDown className="w-5 h-5 text-red-600" />
+                    }
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{transaction.description}</p>
+                    <p className="text-sm text-gray-500">
+                      {transaction.Category?.name || 'No category'} • {new Date(transaction.date).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-              ))
-            )}
+                <p className={`font-bold text-lg ${
+                  transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Budget Alerts */}
+      <div className="bg-white rounded-3xl shadow-lg p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">Budget Status</h3>
+        
+        {budgetOverview?.overBudgetCount > 0 && (
+          <div className="mb-3 p-4 bg-red-100 rounded-2xl border border-red-200">
+            <div className="flex items-center space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-600" />
+              <span className="text-sm font-semibold text-red-800">
+                {budgetOverview.overBudgetCount} budget(s) exceeded
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget Alerts</h3>
-          
-          {budgetOverview?.overBudgetCount > 0 && (
-            <div className="mb-3 p-3 bg-red-100 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="w-5 h-5 text-red-600" />
-                <span className="text-sm font-medium text-red-800">
-                  {budgetOverview.overBudgetCount} budget(s) exceeded
-                </span>
-              </div>
+        {budgetOverview?.closeToLimitCount > 0 && (
+          <div className="mb-3 p-4 bg-yellow-100 rounded-2xl border border-yellow-200">
+            <div className="flex items-center space-x-3">
+              <AlertCircle className="w-5 h-5 text-yellow-600" />
+              <span className="text-sm font-semibold text-yellow-800">
+                {budgetOverview.closeToLimitCount} budget(s) near limit
+              </span>
             </div>
-          )}
+          </div>
+        )}
 
-          {budgetOverview?.closeToLimitCount > 0 && (
-            <div className="mb-3 p-3 bg-yellow-100 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="w-5 h-5 text-yellow-600" />
-                <span className="text-sm font-medium text-yellow-800">
-                  {budgetOverview.closeToLimitCount} budget(s) near limit
-                </span>
-              </div>
+        {(!budgetOverview?.overBudgetCount && !budgetOverview?.closeToLimitCount) && (
+          <div className="p-4 bg-green-100 rounded-2xl border border-green-200">
+            <div className="flex items-center space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-sm font-semibold text-green-800">
+                All budgets on track
+              </span>
             </div>
-          )}
-
-          {(!budgetOverview?.overBudgetCount && !budgetOverview?.closeToLimitCount) && (
-            <div className="p-3 bg-green-100 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-sm font-medium text-green-800">
-                  All budgets on track
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -361,10 +364,9 @@ function TransactionsTab({ transactions, categories, onAddTransaction, onDeleteT
         <h2 className="text-2xl font-bold text-gray-900">Transactions</h2>
         <button
           onClick={onAddTransaction}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
         >
-          <Plus className="w-4 h-4" />
-          <span>Add Transaction</span>
+          <Plus className="w-5 h-5" />
         </button>
       </div>
 
@@ -378,9 +380,9 @@ function TransactionsTab({ transactions, categories, onAddTransaction, onDeleteT
           <button
             key={f.id}
             onClick={() => setFilter(f.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-6 py-3 rounded-2xl text-sm font-semibold transition-all ${
               filter === f.id
-                ? 'bg-blue-100 text-blue-700'
+                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
@@ -390,26 +392,26 @@ function TransactionsTab({ transactions, categories, onAddTransaction, onDeleteT
       </div>
 
       {/* Transactions List */}
-      <div className="bg-white rounded-xl shadow-sm">
+      <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
         {filteredTransactions.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 px-6">
             <Receipt className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No transactions found</h3>
-            <p className="text-gray-500 mb-4">Start by adding your first transaction</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No transactions found</h3>
+            <p className="text-gray-500 mb-6">Start by adding your first transaction</p>
             <button
               onClick={onAddTransaction}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             >
               Add Your First Transaction
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-100">
             {filteredTransactions.map(transaction => (
               <div key={transaction.id} className="p-6 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className={`p-3 rounded-full ${
+                    <div className={`p-3 rounded-2xl ${
                       transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
                     }`}>
                       {transaction.type === 'income' ? 
@@ -418,16 +420,17 @@ function TransactionsTab({ transactions, categories, onAddTransaction, onDeleteT
                       }
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">{transaction.description}</h4>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>{transaction.Category?.name || 'No category'}</span>
-                        <span>•</span>
+                      <h4 className="font-bold text-gray-900">{transaction.description}</h4>
+                      <div className="flex items-center space-x-2 text-sm text-gray-500">
+                        <span className="bg-gray-100 px-3 py-1 rounded-full font-medium">
+                          {transaction.Category?.name || 'No category'}
+                        </span>
                         <span>{new Date(transaction.date).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3">
                     <p className={`text-xl font-bold ${
                       transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                     }`}>
@@ -435,9 +438,9 @@ function TransactionsTab({ transactions, categories, onAddTransaction, onDeleteT
                     </p>
                     <button
                       onClick={() => handleDelete(transaction.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                      className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-xl hover:bg-red-50"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
@@ -455,8 +458,12 @@ function BudgetsTab({ budgets, categories, budgetOverview, onAddBudget, onDelete
   const handleDelete = async (budgetId) => {
     if (window.confirm('Are you sure you want to delete this budget?')) {
       try {
-        await api.delete(`/budgets/${budgetId}`, token);
-        onDeleteBudget();
+        const response = await api.delete(`/budgets/${budgetId}`, token);
+        if (response.success || response.message === 'Budget deleted successfully') {
+          onDeleteBudget();
+        } else {
+          console.error('Delete failed:', response.message);
+        }
       } catch (error) {
         console.error('Error deleting budget:', error);
       }
@@ -466,56 +473,53 @@ function BudgetsTab({ budgets, categories, budgetOverview, onAddBudget, onDelete
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Budget Management</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Budgets</h2>
         <button
           onClick={onAddBudget}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
         >
-          <Plus className="w-4 h-4" />
-          <span>Add Budget</span>
+          <Plus className="w-5 h-5" />
         </button>
       </div>
       
       {/* Budget Overview */}
       {budgetOverview && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Total Budget</p>
-            <p className="text-2xl font-bold text-blue-600">${budgetOverview.totalBudget?.toFixed(2)}</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-3xl shadow-lg text-white">
+            <p className="text-sm opacity-90 font-medium">Total Budget</p>
+            <p className="text-2xl font-bold">${budgetOverview.totalBudget?.toFixed(2) || '0.00'}</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Total Spent</p>
-            <p className="text-2xl font-bold text-red-600">${budgetOverview.totalSpent?.toFixed(2)}</p>
+          <div className="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-3xl shadow-lg text-white">
+            <p className="text-sm opacity-90 font-medium">Total Spent</p>
+            <p className="text-2xl font-bold">${budgetOverview.totalSpent?.toFixed(2) || '0.00'}</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Remaining</p>
-            <p className={`text-2xl font-bold ${budgetOverview.remainingBudget >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              ${budgetOverview.remainingBudget?.toFixed(2)}
-            </p>
+          <div className={`p-6 rounded-3xl shadow-lg text-white ${(budgetOverview.remainingBudget || 0) >= 0 ? 'bg-gradient-to-br from-green-500 to-emerald-600' : 'bg-gradient-to-br from-orange-500 to-red-600'}`}>
+            <p className="text-sm opacity-90 font-medium">Remaining</p>
+            <p className="text-2xl font-bold">${budgetOverview.remainingBudget?.toFixed(2) || '0.00'}</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Usage</p>
-            <p className="text-2xl font-bold text-purple-600">{budgetOverview.budgetUsedPercentage}%</p>
+          <div className="bg-gradient-to-br from-purple-500 to-violet-600 p-6 rounded-3xl shadow-lg text-white">
+            <p className="text-sm opacity-90 font-medium">Usage</p>
+            <p className="text-2xl font-bold">{budgetOverview.budgetUsedPercentage || 0}%</p>
           </div>
         </div>
       )}
 
       {/* Budget Categories */}
-      <div className="bg-white rounded-xl shadow-sm">
+      <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
         {budgets.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 px-6">
             <Target className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No budgets set</h3>
-            <p className="text-gray-500 mb-4">Create budgets to track your spending</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No budgets set</h3>
+            <p className="text-gray-500 mb-6">Create budgets to track your spending</p>
             <button
               onClick={onAddBudget}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             >
               Create Your First Budget
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-100">
             {budgets.map(budget => {
               const percentageUsed = Math.round((budget.spentAmount / budget.budgetAmount) * 100);
               const remaining = budget.budgetAmount - budget.spentAmount;
@@ -525,38 +529,40 @@ function BudgetsTab({ budgets, categories, budgetOverview, onAddBudget, onDelete
               return (
                 <div key={budget.id} className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-2xl">{budget.Category?.icon || '💰'}</div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-3xl bg-gray-100 p-3 rounded-2xl">
+                        {budget.Category?.icon || '💰'}
+                      </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">{budget.Category?.name}</h4>
+                        <h4 className="font-bold text-gray-900 text-lg">{budget.Category?.name}</h4>
                         <p className="text-sm text-gray-500">
-                          ${budget.spentAmount.toFixed(2)} of ${budget.budgetAmount.toFixed(2)}
+                          ${budget.spentAmount?.toFixed(2) || '0.00'} of ${budget.budgetAmount?.toFixed(2) || '0.00'}
                         </p>
                       </div>
                     </div>
                     
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
-                        <p className={`font-semibold ${status === 'over' ? 'text-red-600' : status === 'warning' ? 'text-yellow-600' : 'text-green-600'}`}>
-                          ${remaining.toFixed(2)} remaining
+                        <p className={`font-bold text-lg ${status === 'over' ? 'text-red-600' : status === 'warning' ? 'text-yellow-600' : 'text-green-600'}`}>
+                          ${remaining?.toFixed(2) || '0.00'}
                         </p>
                         <p className="text-sm text-gray-500">{percentageUsed}% used</p>
                       </div>
                       <button
                         onClick={() => handleDelete(budget.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        className="p-3 text-gray-400 hover:text-red-600 transition-colors rounded-xl hover:bg-red-50"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
                   
                   {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 rounded-full h-3">
                     <div 
-                      className={`h-2 rounded-full transition-all ${
-                        status === 'over' ? 'bg-red-500' : 
-                        status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'
+                      className={`h-3 rounded-full transition-all ${
+                        status === 'over' ? 'bg-gradient-to-r from-red-500 to-red-600' : 
+                        status === 'warning' ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gradient-to-r from-green-500 to-emerald-600'
                       }`}
                       style={{ width: `${Math.min(percentageUsed, 100)}%` }}
                     />
@@ -587,80 +593,99 @@ function AnalyticsTab({ transactions, categories, budgets }) {
     amount: amount.toFixed(2)
   }));
 
+  const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Analytics</h2>
+        <BarChart3 className="w-6 h-6 text-gray-400" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-6">
+        {/* Activity Summary */}
+        <div className="bg-white rounded-3xl shadow-lg p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-6">Activity Summary</h3>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-green-100 p-3 rounded-2xl">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
+                </div>
+                <span className="font-semibold text-gray-900">Total Income</span>
+              </div>
+              <span className="font-bold text-xl text-green-600">
+                ${totalIncome.toFixed(2)}
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl border border-red-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-red-100 p-3 rounded-2xl">
+                  <TrendingDown className="w-6 h-6 text-red-600" />
+                </div>
+                <span className="font-semibold text-gray-900">Total Expenses</span>
+              </div>
+              <span className="font-bold text-xl text-red-600">
+                ${totalExpenses.toFixed(2)}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-blue-100 p-3 rounded-2xl">
+                  <Target className="w-6 h-6 text-blue-600" />
+                </div>
+                <span className="font-semibold text-gray-900">Active Budgets</span>
+              </div>
+              <span className="font-bold text-xl text-blue-600">{budgets.length}</span>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl border border-purple-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-purple-100 p-3 rounded-2xl">
+                  <Receipt className="w-6 h-6 text-purple-600" />
+                </div>
+                <span className="font-semibold text-gray-900">Total Transactions</span>
+              </div>
+              <span className="font-bold text-xl text-purple-600">{transactions.length}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Spending by Category */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Spending by Category</h3>
+        <div className="bg-white rounded-3xl shadow-lg p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-6">Spending by Category</h3>
           
           {categoryData.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <PieChart className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No expense data available</p>
+              <p className="font-medium">No expense data available</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {categoryData.map((category, index) => (
-                <div key={category.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div 
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: `hsl(${index * 137.508}deg, 70%, 60%)` }}
-                    />
-                    <span className="font-medium text-gray-900">{category.name}</span>
+              {categoryData.map((category, index) => {
+                const percentage = totalExpenses > 0 ? ((category.amount / totalExpenses) * 100).toFixed(1) : 0;
+                return (
+                  <div key={category.name} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                    <div className="flex items-center space-x-4">
+                      <div 
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: `hsl(${index * 137.508}deg, 70%, 60%)` }}
+                      />
+                      <div>
+                        <span className="font-semibold text-gray-900">{category.name}</span>
+                        <p className="text-sm text-gray-500">{percentage}% of total</p>
+                      </div>
+                    </div>
+                    <span className="font-bold text-gray-900">${category.amount}</span>
                   </div>
-                  <span className="font-semibold text-gray-900">${category.amount}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
-        </div>
-
-        {/* Recent Activity Summary */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Activity Summary</h3>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-                <span className="font-medium text-gray-900">Total Income</span>
-              </div>
-              <span className="font-semibold text-green-600">
-                ${transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0).toFixed(2)}
-              </span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <TrendingDown className="w-5 h-5 text-red-600" />
-                <span className="font-medium text-gray-900">Total Expenses</span>
-              </div>
-              <span className="font-semibold text-red-600">
-                ${transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0).toFixed(2)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <Target className="w-5 h-5 text-blue-600" />
-                <span className="font-medium text-gray-900">Active Budgets</span>
-              </div>
-              <span className="font-semibold text-blue-600">{budgets.length}</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <Receipt className="w-5 h-5 text-purple-600" />
-                <span className="font-medium text-gray-900">Total Transactions</span>
-              </div>
-              <span className="font-semibold text-purple-600">{transactions.length}</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -677,10 +702,12 @@ function AddTransactionModal({ categories, token, onClose, onSuccess }) {
     date: new Date().toISOString().split('T')[0]
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       const response = await api.post('/transactions', {
@@ -691,68 +718,92 @@ function AddTransactionModal({ categories, token, onClose, onSuccess }) {
 
       if (response.success) {
         onSuccess();
+      } else {
+        setError(response.message || 'Failed to add transaction');
       }
     } catch (error) {
       console.error('Error adding transaction:', error);
+      setError('Connection error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Add Transaction</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            ×
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-2xl font-bold text-gray-900">Add Transaction</h3>
+          <button 
+            onClick={onClose} 
+            className="text-gray-400 hover:text-gray-600 p-2 rounded-2xl hover:bg-gray-100 transition-all"
+          >
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Description</label>
             <input
               type="text"
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
+              placeholder="Enter description"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Amount</label>
             <input
               type="number"
               step="0.01"
               value={formData.amount}
               onChange={(e) => setFormData({...formData, amount: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
+              placeholder="0.00"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-            <select
-              value={formData.type}
-              onChange={(e) => setFormData({...formData, type: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="expense">Expense</option>
-              <option value="income">Income</option>
-            </select>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={() => setFormData({...formData, type: 'expense', categoryId: ''})}
+                className={`flex-1 py-4 px-6 rounded-2xl font-semibold transition-all ${
+                  formData.type === 'expense'
+                    ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Expense
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({...formData, type: 'income', categoryId: ''})}
+                className={`flex-1 py-4 px-6 rounded-2xl font-semibold transition-all ${
+                  formData.type === 'income'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Income
+              </button>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Category</label>
             <select
               value={formData.categoryId}
               onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
             >
-              <option value="">Select category</option>
+              <option value="">Select category (optional)</option>
               {categories
                 .filter(c => c.type === formData.type)
                 .map(category => (
@@ -764,28 +815,34 @@ function AddTransactionModal({ categories, token, onClose, onSuccess }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Date</label>
             <input
               type="date"
               value={formData.date}
               onChange={(e) => setFormData({...formData, date: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
               required
             />
           </div>
 
-          <div className="flex space-x-3 pt-4">
+          {error && (
+            <div className="p-4 rounded-2xl bg-red-100 text-red-800 border border-red-200 text-sm font-medium">
+              {error}
+            </div>
+          )}
+
+          <div className="flex space-x-4 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex-1 px-6 py-4 text-gray-700 bg-gray-100 rounded-2xl font-semibold hover:bg-gray-200 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-semibold hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
             >
               {loading ? 'Adding...' : 'Add Transaction'}
             </button>
@@ -796,93 +853,231 @@ function AddTransactionModal({ categories, token, onClose, onSuccess }) {
   );
 }
 
-// Add Budget Modal
+// Add Budget Modal - Fixed version
 function AddBudgetModal({ categories, token, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     categoryId: '',
     budgetAmount: ''
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Filter categories to only show expense categories for budgets
+  const expenseCategories = categories.filter(c => c.type === 'expense');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
+
+    if (!formData.categoryId) {
+      setError('Please select a category');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.budgetAmount || parseFloat(formData.budgetAmount) <= 0) {
+      setError('Please enter a valid budget amount');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await api.post('/budgets', {
-        ...formData,
+        categoryId: parseInt(formData.categoryId),
         budgetAmount: parseFloat(formData.budgetAmount)
       }, token);
 
-      if (response.success) {
+      console.log('Budget creation response:', response);
+
+      if (response.success || response.budget) {
         onSuccess();
+      } else {
+        setError(response.message || 'Failed to create budget');
       }
     } catch (error) {
       console.error('Error adding budget:', error);
+      setError('Connection error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Add Budget</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            ×
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-2xl font-bold text-gray-900">Add Budget</h3>
+          <button 
+            onClick={onClose} 
+            className="text-gray-400 hover:text-gray-600 p-2 rounded-2xl hover:bg-gray-100 transition-all"
+          >
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Category</label>
             <select
               value={formData.categoryId}
               onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
               required
             >
-              <option value="">Select category</option>
-              {categories.map(category => (
+              <option value="">Select a category</option>
+              {expenseCategories.map(category => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
               ))}
             </select>
+            {expenseCategories.length === 0 && (
+              <p className="text-sm text-gray-500 mt-2">No expense categories available. Categories may need to be created first.</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Budget Amount</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Budget Amount</label>
             <input
               type="number"
               step="0.01"
+              min="0.01"
               value={formData.budgetAmount}
               onChange={(e) => setFormData({...formData, budgetAmount: e.target.value})}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-4 border-0 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all text-gray-900"
+              placeholder="0.00"
               required
             />
           </div>
 
-          <div className="flex space-x-3 pt-4">
+          {error && (
+            <div className="p-4 rounded-2xl bg-red-100 text-red-800 border border-red-200 text-sm font-medium">
+              {error}
+            </div>
+          )}
+
+          <div className="flex space-x-4 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex-1 px-6 py-4 text-gray-700 bg-gray-100 rounded-2xl font-semibold hover:bg-gray-200 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              disabled={loading || expenseCategories.length === 0}
+              className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-semibold hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
             >
-              {loading ? 'Adding...' : 'Add Budget'}
+              {loading ? 'Creating...' : 'Create Budget'}
             </button>
           </div>
         </form>
       </div>
     </div>
+  );
+}
+
+// Mobile Navigation Component
+function MobileNav({ activeTab, setActiveTab, onLogout, user }) {
+  const [showMenu, setShowMenu] = useState(false);
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: Home },
+    { id: 'transactions', label: 'Transactions', icon: Receipt },
+    { id: 'budgets', label: 'Budgets', icon: Target },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 }
+  ];
+
+  return (
+    <>
+      {/* Top Header */}
+      <div className="bg-white shadow-lg border-b sticky top-0 z-40">
+        <div className="px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg">
+                <DollarSign className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">FinanceFlow</h1>
+                <p className="text-sm text-gray-500">Welcome, {user?.username}</p>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 rounded-2xl hover:bg-gray-100 transition-colors"
+            >
+              {showMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+
+          {/* Dropdown Menu */}
+          {showMenu && (
+            <div className="absolute top-full left-0 right-0 bg-white shadow-xl border-t z-50">
+              <div className="py-4">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setShowMenu(false);
+                    }}
+                    className={`w-full flex items-center space-x-3 px-6 py-4 text-left transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-gradient-to-r from-purple-50 to-blue-50 text-purple-700 border-r-4 border-purple-600'
+                        : 'text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <tab.icon className="w-5 h-5" />
+                    <span className="font-medium">{tab.label}</span>
+                  </button>
+                ))}
+                <hr className="my-2" />
+                <button
+                  onClick={() => {
+                    onLogout();
+                    setShowMenu(false);
+                  }}
+                  className="w-full flex items-center space-x-3 px-6 py-4 text-left text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Logout</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40">
+        <div className="grid grid-cols-4 py-2">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex flex-col items-center justify-center py-3 transition-all ${
+                activeTab === tab.id
+                  ? 'text-purple-600'
+                  : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              <tab.icon className={`w-6 h-6 mb-1 ${
+                activeTab === tab.id ? 'scale-110' : ''
+              } transition-transform`} />
+              <span className={`text-xs font-medium ${
+                activeTab === tab.id ? 'text-purple-600' : 'text-gray-400'
+              }`}>
+                {tab.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -912,9 +1107,11 @@ function Dashboard({ user, token, onLogout }) {
         api.get('/budgets/overview', token)
       ]);
 
-      if (transRes.success) setTransactions(transRes.transactions);
-      if (catRes.success) setCategories(catRes.categories);
-      if (budgetRes.success) setBudgets(budgetRes.budgets);
+      console.log('API Responses:', { transRes, catRes, budgetRes, overviewRes });
+
+      if (transRes.success) setTransactions(transRes.transactions || []);
+      if (catRes.success) setCategories(catRes.categories || []);
+      if (budgetRes.success) setBudgets(budgetRes.budgets || []);
       if (overviewRes.success) setBudgetOverview(overviewRes.overview);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -936,70 +1133,25 @@ function Dashboard({ user, token, onLogout }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your financial data...</p>
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading your financial data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-3">
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 w-10 h-10 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-white" />
-                </div>
-                <h1 className="text-xl font-bold text-gray-900">Finance App</h1>
-              </div>
-              
-              <div className="flex space-x-1">
-                {[
-                  { id: 'overview', label: 'Overview', icon: Home },
-                  { id: 'transactions', label: 'Transactions', icon: Receipt },
-                  { id: 'budgets', label: 'Budgets', icon: Target },
-                  { id: 'analytics', label: 'Analytics', icon: BarChart3 }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    <tab.icon className="w-4 h-4" />
-                    <span>{tab.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 pb-20">
+      <MobileNav 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        onLogout={onLogout} 
+        user={user} 
+      />
 
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm text-gray-600">Welcome back,</p>
-                <p className="text-sm font-medium text-gray-900">{user?.username}</p>
-              </div>
-              <button
-                onClick={onLogout}
-                className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-red-600 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 py-6">
         {activeTab === 'overview' && (
           <OverviewTab 
             totalIncome={totalIncome}
@@ -1056,7 +1208,7 @@ function Dashboard({ user, token, onLogout }) {
 
       {showAddBudget && (
         <AddBudgetModal
-          categories={categories.filter(c => c.type === 'expense')}
+          categories={categories}
           token={token}
           onClose={() => setShowAddBudget(false)}
           onSuccess={() => {
