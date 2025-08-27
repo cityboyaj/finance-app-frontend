@@ -223,7 +223,7 @@ const FinanceApp = () => {
   };
 
   const handleDeleteTransaction = async (id) => {
-    if (!confirm('Delete this transaction?')) return;
+    if (!window.confirm('Delete this transaction?')) return;
     
     try {
       const response = await fetch(`${API_BASE}/transactions/${id}`, {
